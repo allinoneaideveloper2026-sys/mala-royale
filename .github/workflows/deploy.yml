@@ -1,21 +1,24 @@
-name: Build PWA & Android APK
+name: Deploy PWA to GitHub Pages
 
 on:
   push:
-    branches:
-      - main
-    tags:
-      - 'v*'
+    branches: ["main"]
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
   pages: write
   id-token: write
 
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
 jobs:
-  # JOB 1: Deploy PWA to GitHub Pages
-  deploy-pwa:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -32,50 +35,14 @@ jobs:
       - name: Build Web App
         run: npx vite build
 
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: './dist'
+
       - name: Deploy to GitHub Pages
-        uses: JamesIves/github-pages-deploy-action@v4
-        with:
-          folder: dist
-          branch: gh-pages
-          single-commit: true
-
-  # JOB 2: Build Android APK
-  build-apk:
-    needs: deploy-pwa
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-
-      - name: Setup Java JDK
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'zulu'
-          java-version: '17'
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-
-      - name: Install Dependencies & Build Frontend
-        run: |
-          npm install --legacy-peer-deps
-          npx vite build
-
-      - name: Initialize Android & Sync Capacitor
-        run: |
-          npx cap add android || true
-          npx cap sync android
-
-      - name: Build Debug APK via Gradle
-        run: |
-          cd android
-          chmod +x gradlew
-          ./gradlew assembleDebug
-
-      - name: Upload APK as Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: app-debug-apk
-          path: android/app/build/outputs/apk/debug/app-debug.apk
+        id: deployment
+        uses: actions/deploy-pages@v4
