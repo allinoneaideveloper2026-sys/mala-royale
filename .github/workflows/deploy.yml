@@ -27,7 +27,7 @@ jobs:
           node-version: 22
 
       - name: Install Dependencies
-        run: npm ci --legacy-peer-deps || npm install
+        run: npm install --legacy-peer-deps
 
       - name: Build Web App
         run: npx vite build
@@ -36,7 +36,8 @@ jobs:
         uses: JamesIves/github-pages-deploy-action@v4
         with:
           folder: dist
-          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: gh-pages
+          single-commit: true
 
   # JOB 2: Build Android APK
   build-apk:
@@ -59,7 +60,7 @@ jobs:
 
       - name: Install Dependencies & Build Frontend
         run: |
-          npm ci --legacy-peer-deps || npm install
+          npm install --legacy-peer-deps
           npx vite build
 
       - name: Initialize Android & Sync Capacitor
