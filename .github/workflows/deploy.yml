@@ -32,10 +32,10 @@ jobs:
           node-version: 22
 
       - name: Install Dependencies
-        run: npm install --legacy-peer-deps
+        run: npm ci || npm install --legacy-peer-deps
 
       - name: Build Web App
-        run: npx vite build
+        run: npm run build
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
@@ -69,8 +69,8 @@ jobs:
 
       - name: Install Dependencies & Build Frontend
         run: |
-          npm install --legacy-peer-deps
-          npx vite build
+          npm ci || npm install --legacy-peer-deps
+          npm run build
 
       - name: Sync Capacitor Android
         run: |
