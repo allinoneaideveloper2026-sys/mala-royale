@@ -51,10 +51,37 @@ export default function App() {
     ? PRODUCTS 
     : PRODUCTS.filter(p => p.category === filter);
 
+  // Function to share the web app URL via Web Share API or Clipboard fallback
+  const handleShareApp = async () => {
+    const shareData = {
+      title: 'Mala Royale',
+      text: 'Explore exclusive Sarees & custom Kuchu designs at Mala Royale Boutique!',
+      url: 'https://allinoneaideveloper2026-sys.github.io/mala-royale/',
+    };
+
+    if (navigator.share) {
+      try {
+        await navigator.share(shareData);
+      } catch (err) {
+        console.log('Share prompt dismissed', err);
+      }
+    } else {
+      await navigator.clipboard.writeText(shareData.url);
+      alert('Mala Royale link copied to clipboard!');
+    }
+  };
+
+  // Function to enquire about a specific product via WhatsApp/Share
+  const handleEnquire = (product: Product) => {
+    const message = `Hello Mala Royale, I am interested in: ${product.name} (${product.price}). Link: https://allinoneaideveloper2026-sys.github.io/mala-royale/`;
+    const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(message)}`;
+    window.open(whatsappUrl, '_blank');
+  };
+
   return (
     <div style={{ fontFamily: 'Georgia, serif', backgroundColor: '#fdf8f6', color: '#333', minHeight: '100vh', margin: 0 }}>
       {/* Navigation Header */}
-      <header style={{ backgroundColor: '#6e1a3a', color: '#fff', padding: '1.5rem 2rem', textAlign: 'center', boxShadow: '0 2px 8px rgba(0,0,0,0.15)' }}>
+      <header style={{ backgroundColor: '#6e1a3a', color: '#fff', padding: '1.5rem 2rem', textAlign: 'center', boxShadow: '0 2px 8px rgba(0,0,0,0.15)', position: 'relative' }}>
         <h1 style={{ margin: 0, fontSize: '2.4rem', letterSpacing: '1px' }}>Mala Royale</h1>
         <p style={{ margin: '0.4rem 0 0', fontSize: '1rem', fontStyle: 'italic', opacity: 0.9 }}>
           Exclusive Sarees & Bespoke Kuchu Craftsmanship
@@ -62,12 +89,14 @@ export default function App() {
       </header>
 
       {/* Hero Banner */}
-      <section style={{ textAlignment: 'center', padding: '3rem 1.5rem', backgroundColor: '#f7ebe8', textAlign: 'center' }}>
+      <section style={{ padding: '3rem 1.5rem', backgroundColor: '#f7ebe8', textAlign: 'center' }}>
         <h2 style={{ color: '#6e1a3a', fontSize: '1.8rem', marginTop: 0 }}>Elegance Woven Into Every Detail</h2>
         <p style={{ maxWidth: '600px', margin: '0.5rem auto 1.5rem', fontSize: '1.05rem', lineHeight: '1.6' }}>
           Explore our handpicked saree collections and personalize your garments with custom handcrafted saree tassels (Kuchu).
         </p>
-        <div>
+        
+        {/* Category Filters */}
+        <div style={{ marginBottom: '1.5rem' }}>
           {(['All', 'Sarees', 'Custom Kuchu'] as const).map(category => (
             <button
               key={category}
@@ -88,6 +117,24 @@ export default function App() {
             </button>
           ))}
         </div>
+
+        {/* Share App Action Button */}
+        <button
+          onClick={handleShareApp}
+          style={{
+            backgroundColor: '#25D366',
+            color: '#fff',
+            border: 'none',
+            padding: '0.7rem 1.5rem',
+            borderRadius: '25px',
+            fontSize: '0.95rem',
+            fontWeight: 'bold',
+            cursor: 'pointer',
+            boxShadow: '0 2px 6px rgba(0,0,0,0.15)'
+          }}
+        >
+          📲 Share App / Catalog
+        </button>
       </section>
 
       {/* Product Grid */}
@@ -105,7 +152,7 @@ export default function App() {
                 <div style={{ marginTop: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <span style={{ fontSize: '1.25rem', fontWeight: 'bold', color: '#6e1a3a' }}>{product.price}</span>
                   <button 
-                    onClick={() => alert(`Enquiring about ${product.name}`)}
+                    onClick={() => handleEnquire(product)}
                     style={{ backgroundColor: '#6e1a3a', color: '#fff', border: 'none', padding: '0.5rem 1rem', borderRadius: '6px', cursor: 'pointer', fontSize: '0.9rem' }}
                   >
                     Enquire Now
