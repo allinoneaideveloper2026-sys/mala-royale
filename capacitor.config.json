@@ -1,1 +1,5 @@
-{ "appId": "in.malaroyale.app", "appName": "Mala Royale", "webDir": "dist" }
+{
+  "appId": "com.malaroyale.app",
+  "appName": "Mala Royale",
+  "webDir": "dist"
+}
